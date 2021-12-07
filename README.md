@@ -22,5 +22,5 @@ This is an solution for the challenge Code vs Zombie in [Codingame](https://www.
 - Do performance testing and optimize the codebase to be able to simulated more games during the 100 ms allowed in one turn
 ```
 ## Contribute
-Fork the repo and create a PR and request 
+Fork the repo and create a PR request 
 https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project
