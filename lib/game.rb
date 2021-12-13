@@ -171,10 +171,10 @@ class Game
     # @history << @ash.move_towards_target(@zombies)
     if !@game_over
       @ash.move_towards_target(@zombies)
+      @history << [@ash.x, @ash.y]
       debug "Ash #{@ash}"
       @zombies.each do |zombie|
-        # @zombie_history << zombie.move
-        # zombie.move_towards_target(@humans + [@ash])
+        @zombie_history << zombie.move
         zombie.move_towards_target(@humans + [@ash])
         debug "Zombie #{zombie}"
       end
