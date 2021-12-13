@@ -4,11 +4,11 @@ require 'ruby2d'
 BOARD_MAX_X = 1600
 BOARD_MAX_Y = 900
 ZOMBIE_SPEED = 4
-ASH_SPEED = 5
-GUN_RADIUS = 50
+ASH_SPEED = 4
+GUN_RADIUS = 20
 
 class Parent
-    attr_accessor :x, :y, :id, :game, :target 
+    attr_accessor :x, :y, :id, :game, :target
     def initialize x, y, id, speed, game
       @x, @y, @id, @speed, @game = x, y, id, speed, game
       @target = nil
@@ -24,7 +24,6 @@ class Parent
       rotation = Math.atan2(y - @y, x - @x);
 
       # Move towards the player
-      speed = 2
       @x += Math.cos(rotation) * @speed;
       @y += Math.sin(rotation) * @speed;
     end
@@ -78,6 +77,14 @@ end
 class Human < Parent; end
 
 class Zombie < Parent
+
+  # get a random target
+  def get_new_target(targets)
+    # pick the closest target
+    targets.sort_by do |target|
+      self.distance_from_point(target.x, target.y)
+    end.first
+  end
 end
 
 class Ash < Parent
@@ -113,15 +120,28 @@ class Game
     # do not calculate next state actions if game is over
     return if @game_over
 
+    # if a zombie if targeting a human that has been eaten already
+    # select new target
+    @zombies.each do |zombie|
+      if !@humans.include?(zombie.target)
+        zombie.target = nil
+      end
+    end
+
     # remove if humans are dead
     # aka same coordinate as a zombie
     zombies_coordinates = @zombies.map{|z| [z.x, z.y]}
     @humans.delete_if do |human|
-        zombies_coordinates.include?([human.x, human.y])
+        @zombies.any? do |zombie|
+          if human.check_if_target_is_in_radius(zombie.x, zombie.y, ZOMBIE_SPEED)
+            debug "Human #{human} has been eaten by a zombie #{zombie}"
+            zombie.target = nil
+            true
+          else
+            false
+          end
+        end
     end
-
-
-
 
     # remove if zombies are dead
     # aka in the radius of Ash's gun
@@ -129,7 +149,7 @@ class Game
         # A zombie is worth the number of humans still alive squared x10, not including Ash
         # TODO get a more accurate score calculation with the combos
         # if zombie.distance_from_point(@ash.x, @ash.y) <= GUN_RADIUS
-        if zombie.check_if_target_is_in_radius(@ash.x, @ash.y, ZOMBIE_SPEED)
+        if zombie.check_if_target_is_in_radius(@ash.x, @ash.y, ASH_SPEED)
             @score += @humans.count * 10
             debug "Ash shot zombie #{zombie}"
             # target shot, allow ash to change target
@@ -143,23 +163,25 @@ class Game
     # check if the game is over
     if @zombies.count == 0 || @humans.count == 0
       @game_over = true
-      # debug "game is over : zombies #{@zombies.count}, humans #{@humans.count}, score #{@score}"
+      debug "game is over : zombies #{@zombies.count}, humans #{@humans.count}, score #{@score}"
     end
 
     ########## Move randomly ash and zombies #############
 
     # @history << @ash.move_towards_target(@zombies)
     if !@game_over
-      @ash.move_towards_target(@zombies) 
+      @ash.move_towards_target(@zombies)
       debug "Ash #{@ash}"
       @zombies.each do |zombie|
         # @zombie_history << zombie.move
+        # zombie.move_towards_target(@humans + [@ash])
+        zombie.move_towards_target(@humans + [@ash])
         debug "Zombie #{zombie}"
       end
     end
   end
 
-  def debug(info, enabled=false)
+  def debug(info, enabled= true)
     puts info if enabled
   end
 end
@@ -167,26 +189,26 @@ end
 
 
 game = Game.new
-2.times do |n|
+5.times do |n|
   x = rand(BOARD_MAX_X)
   y = rand(BOARD_MAX_Y)
   game.zombies << Zombie.new(x, y, n, ZOMBIE_SPEED, game)
 end
 
-5.times do |n|
+35.times do |n|
   x = rand(BOARD_MAX_X)
   y = rand(BOARD_MAX_Y)
   game.humans << Human.new(x, y, n, 0, game)
 end
-# game.zombies << Zombie.new(500, 300, 1, ZOMBIE_SPEED, game)
-# game.zombies << Zombie.new(400, 400, 1, ZOMBIE_SPEED, game)
-# game.zombies << Zombie.new(500, 500, 2, ZOMBIE_SPEED, game)
-# game.humans << Human.new(400, 50, 1, 0, game)
-# game.humans << Human.new(400, 50, 1, 0, game)
-# game.humans << Human.new(400, 50, 1, 0, game)
-# game.humans << Human.new(400, 50, 1, 0, game)
-# game.humans << Human.new(50, 50, 1, 0, game)
-# game.humans << Human.new(550, 140, 1, 0, game)
+game.zombies << Zombie.new(500, 300, 1, ZOMBIE_SPEED, game)
+game.zombies << Zombie.new(400, 400, 1, ZOMBIE_SPEED, game)
+game.zombies << Zombie.new(500, 500, 2, ZOMBIE_SPEED, game)
+game.humans << Human.new(400, 50, 1, 0, game)
+game.humans << Human.new(400, 50, 1, 0, game)
+game.humans << Human.new(400, 50, 1, 0, game)
+game.humans << Human.new(400, 50, 1, 0, game)
+game.humans << Human.new(50, 50, 1, 0, game)
+game.humans << Human.new(550, 140, 1, 0, game)
 game.ash = Ash.new(600, 600, 1, ASH_SPEED, game)
 
 set title: "Simulation Code vs Zombie"
@@ -197,15 +219,46 @@ set resizeable: true
 
 tick = 0
 update do
+  # clear board
   clear
-  game.ash.draw('blue')
-  game.zombies.each {|z| z.draw('red')}
-  game.humans.each {|h| h.draw('green')}
 
   game.next_sate
 
+  # Ash
+  ash = game.ash
+  ash.draw('blue')
+  Text.new("x #{ash.x}, y: #{ash.y}", x: ash.x+10, y: ash.y+10, color: 'blue', size: 10)
+  if ash.target
+    Line.new(
+      x1: ash.x, y1: ash.y,
+      x2: ash&.target&.x, y2: ash&.target&.y,
+      width: 1,
+      color: 'blue',
+      z: 20
+    )
+  end
+
+  # Zombies
+  game.zombies.each do |z|
+    z.draw('red')
+    Text.new("x #{z.x}, y: #{z.y}", x: z.x+10, y: z.y+10, color: 'red', size: 10)
+    if z.target
+      Line.new(
+        x1: z.x, y1: z.y,
+        x2: z&.target&.x, y2: z&.target&.y,
+        width: 1,
+        color: 'green',
+        z: 50
+      )
+    end
+  end
+
+  # Humans
+  game.humans.each {|h| h.draw('green')}
+
+
   if game.game_over
-    Text.new('Game Over', x: BOARD_MAX_X/2, y: BOARD_MAX_Y/2, color: 'red', size: 100)
+    Text.new("Game Over zombies #{game.zombies.count}, humans #{game.humans.count}, score #{game.score}", x: BOARD_MAX_X/2, y: BOARD_MAX_Y/2, color: 'red', size: 30)
   end
 
   tick += 1
