@@ -32,11 +32,9 @@ class Parent
     def move_towards_target(targets)
       if @target.nil?
         @target = get_new_target(targets)
-        move_towards_coordinates(@target.x, @target.y)
-      else
-        move_towards_coordinates(@target.x, @target.y)
       end
 
+      move_towards_coordinates(@target.x, @target.y)
       [@x, @y]
     end
 
@@ -54,6 +52,7 @@ class Parent
     def draw(color)
       # Square.new(x: @x, y: @y, size: 5, color: color)
       Circle.new(x: @x, y: @y, radius: 10, color: color)
+      Text.new("#{@id}", x: @x-5, y: @y-5, color: 'black', size: 10) if @id
     end
 
     def move
@@ -224,6 +223,9 @@ update do
 
   game.next_sate
 
+  # timer
+  Text.new("Timer : #{tick}", x: 10, y: 10, color: 'blue', size: 10)
+
   # Ash
   ash = game.ash
   ash.draw('blue')
@@ -242,6 +244,7 @@ update do
   game.zombies.each do |z|
     z.draw('red')
     Text.new("x #{z.x}, y: #{z.y}", x: z.x+10, y: z.y+10, color: 'red', size: 10)
+    Text.new("target #{z.target&.id}", x: z.x+10, y: z.y+20, color: 'red', size: 10)
     if z.target
       Line.new(
         x1: z.x, y1: z.y,
@@ -261,7 +264,7 @@ update do
     Text.new("Game Over zombies #{game.zombies.count}, humans #{game.humans.count}, score #{game.score}", x: BOARD_MAX_X/2, y: BOARD_MAX_Y/2, color: 'red', size: 30)
   end
 
-  tick += 1
+  tick += 1 unless game.game_over
 end
 
 show
