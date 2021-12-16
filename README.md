@@ -16,7 +16,7 @@ This is an solution for the challenge Code vs Zombie in [Codingame](https://www.
 - Implement some testing framework for judging model behaviour
 - Make the model more similar to the codingame framework 
   - Zombies don't move randomly, they pick human targets including Ash
-  - Ash should pick a target zombie randomly as wwell   
+  - Ash should pick a target zombie randomly as well   
   - The scoring system should reflect the combo calculations
 - keep track of time and simulate games as long as we are under the 100 ms instead of a predetermined number
 - Do performance testing and optimize the codebase to be able to simulated more games during the 100 ms allowed in one turn
