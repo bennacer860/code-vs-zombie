@@ -1,11 +1,18 @@
 require 'byebug'
 require 'ruby2d'
 
+# BOARD_MAX_X = 1600
+# BOARD_MAX_Y = 900
+# ZOMBIE_SPEED = 4
+# ASH_SPEED = 4
+# GUN_RADIUS = 20
+#
+
 BOARD_MAX_X = 1600
 BOARD_MAX_Y = 900
 ZOMBIE_SPEED = 4
-ASH_SPEED = 4
-GUN_RADIUS = 20
+ASH_SPEED = 10
+GUN_RADIUS = 10
 
 class Parent
     attr_accessor :x, :y, :id, :game, :target
@@ -261,7 +268,7 @@ update do
 
 
   if game.game_over
-    Text.new("Game Over zombies #{game.zombies.count}, humans #{game.humans.count}, score #{game.score}", x: BOARD_MAX_X/2, y: BOARD_MAX_Y/2, color: 'red', size: 30)
+    Text.new("Game Over zombies #{game.zombies.count}, humans #{game.humans.count}, score #{game.score}", x: 10, y: 15, color: 'red', size: 10)
   end
 
   tick += 1 unless game.game_over
