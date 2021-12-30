@@ -12,11 +12,11 @@ This is an solution for the challenge Code vs Zombie in [Codingame](https://www.
   + Update score every turn
   + Find the best scoring game and if there are multiple game with the same score pick the one that has less turns 
 - Convert code into python
-- Find a gaming engine that will display a game simulation (ex: https://www.pygame.org/)
++ Find a gaming engine that will display a game simulation (ex: https://www.pygame.org/)
 - Implement some testing framework for judging model behaviour
-- Make the model more similar to the codingame framework 
-  - Zombies don't move randomly, they pick human targets including Ash
-  - Ash should pick a target zombie randomly as wwell   
++ Make the model more similar to the codingame framework 
+  + Zombies don't move randomly, they pick human targets including Ash
+  + Ash should pick a target zombie randomly as wwell   
   - The scoring system should reflect the combo calculations
 - keep track of time and simulate games as long as we are under the 100 ms instead of a predetermined number
 - Do performance testing and optimize the codebase to be able to simulated more games during the 100 ms allowed in one turn
