@@ -23,7 +23,10 @@ This is an solution for the challenge Code vs Zombie in [Codingame](https://www.
 ```
 
 ## Example of a simulated game 
-
+```
+bundle install
+ruby lib/game.rb
+```
 <img width="1601" alt="Screen Shot 2021-12-30 at 10 15 44 AM" src="https://user-images.githubusercontent.com/205614/147764233-4ecd7a67-ae8b-4a96-b286-1615392108f0.png">
 
 ## Contribute
