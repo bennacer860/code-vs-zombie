@@ -21,6 +21,11 @@ This is an solution for the challenge Code vs Zombie in [Codingame](https://www.
 - keep track of time and simulate games as long as we are under the 100 ms instead of a predetermined number
 - Do performance testing and optimize the codebase to be able to simulated more games during the 100 ms allowed in one turn
 ```
+
+## Example of a simulated game 
+
+<img width="1601" alt="Screen Shot 2021-12-30 at 10 15 44 AM" src="https://user-images.githubusercontent.com/205614/147764233-4ecd7a67-ae8b-4a96-b286-1615392108f0.png">
+
 ## Contribute
 Fork the repo and create a PR request 
 https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project
